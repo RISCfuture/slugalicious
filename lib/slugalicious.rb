@@ -184,8 +184,6 @@ module Slugalicious
       end
     end
 
-    private
-
     def make_slug
       slugs_in_use = if slugs.loaded? then
                        slugs.map(&:slug)
