@@ -186,11 +186,21 @@ def find_product
 end
 </code></pre>
 
-The old URL will remain indefinitely, but users who hit it will be redirected to the new URL. Ideally, links to the old URL will be replaced over time with links to the new URL.
+The old URL will remain indefinitely, but users who hit it will be redirected to
+the new URL. Ideally, links to the old URL will be replaced over time with links
+to the new URL.
 
-The problem is that even though the old slug is inactive, it's still "taken." If you create a product called "Keyboard", but then rename it to "Piano", the product will claim both the "keyboard" and "piano" slugs. If you had renamed it to make room for a different product called "Keyboard" (like a computer keyboard), you'd find its slug is "keyboard;2" or similar.
+The problem is that even though the old slug is inactive, it's still "taken." If
+you create a product called "Keyboard", but then rename it to "Piano", the
+product will claim both the "keyboard" and "piano" slugs. If you had renamed it
+to make room for a different product called "Keyboard" (like a computer
+keyboard), you'd find its slug is "keyboard;2" or similar.
 
-To prevent the slug namespace from becoming more and more polluted over time, websites generally expire inactive slugs after a period of time. To do this in Slugalicious, write a task that periodically checks for and deletes old, inactive @Slug@ records. Such a task could be invoked through a cron job, for instance. An example:
+To prevent the slug namespace from becoming more and more polluted over time,
+websites generally expire inactive slugs after a period of time. To do this in
+Slugalicious, write a task that periodically checks for and deletes old,
+inactive @Slug@ records. Such a task could be invoked through a cron job, for
+instance. An example:
 
 <pre><code>
 Slug.inactive.where([ "created_at < ?", 30.days.ago ]).delete_all
