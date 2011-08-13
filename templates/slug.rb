@@ -44,6 +44,9 @@ class Slug < ActiveRecord::Base
             allow_blank: true
   validate :one_active_slug_per_object
   
+  after_save :invalidate_cache
+  after_destroy :invalidate_cache
+  
   # Marks a slug as active and deactivates all other slugs assigned to the
   # record.
 
@@ -59,5 +62,10 @@ class Slug < ActiveRecord::Base
   def one_active_slug_per_object
     return unless new_record? or (active? and active_changed?)
     errors.add(:active, :one_per_sluggable) if active? and Slug.active.for(sluggable_type, sluggable_id).count > 0
+  end
+  
+  def invalidate_cache
+    Rails.cache.delete "Slug/#{sluggable_type}/#{sluggable_id}/slug"
+    Rails.cache.delete "Slug/#{sluggable_type}/#{sluggable_id}/slug_with_path"
   end
 end

@@ -6,7 +6,7 @@ describe Slug do
     Slug.delete_all
   end
 
-  describe "validation" do
+  context "[validation]" do
     it "should not allow an active slug to be created if one already exists" do
       Factory(:slug, sluggable: @record)
       slug = Factory.build(:slug, sluggable: @record)
@@ -60,6 +60,45 @@ describe Slug do
       s1.reload.should_not be_active
       s2.reload.should_not be_active
       s3.reload.should_not be_active
+    end
+  end
+  
+  context "[caching]" do
+    before :each do
+      Factory(:slug, sluggable: @record)
+    end
+    
+    it "should write the slug to the cache" do
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should be_nil
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
+      
+      @record.slug
+      @record.slug_with_path
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
+    end
+    
+    it "should remove the cached slug when the slug is changed" do
+      slug = Factory(:slug, sluggable: @record, active: false)
+      slug.activate!
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should be_nil
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
+      
+      @record.slug
+      @record.slug_with_path
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
+    end
+    
+    it "should remove the cached slug when the slug is deleted" do
+      @record.slug
+      @record.slug_with_path
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
+      
+      Slug.for(@record).first.destroy
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should be_nil
+      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
     end
   end
 end
