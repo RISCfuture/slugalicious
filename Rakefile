@@ -29,7 +29,7 @@ YARD::Rake::YardocTask.new('doc') do |doc|
   doc.options << "--protected"
   doc.options << "-r" << "README.textile"
   doc.options << "-o" << "doc"
-  doc.options << "--title" << "Slugalicious Documentation".inspect
+  doc.options << "--title" << "Slugalicious Documentation"
   
   doc.files = [ 'lib/**/*', 'README.textile', 'templates/slug.rb' ]
 end
