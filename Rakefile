@@ -16,8 +16,7 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/riscfuture/slugalicious"
   gem.authors = [ "Tim Morgan" ]
   gem.required_ruby_version = '>= 1.9'
-  gem.add_dependency "rails", ">= 3.0"
-  gem.add_dependency 'stringex'
+  gem.files = [ 'lib/**/*', 'LICENSE', 'README.textile', 'templates/*', 'slugalicious.gemspec' ]
 end
 Jeweler::GemcutterTasks.new
 
