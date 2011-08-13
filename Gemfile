@@ -5,13 +5,14 @@ gem 'rails', '>= 3.0'
 gem 'stringex'
 
 # DEVELOPMENT
-gem 'jeweler'
-gem 'yard'
-gem 'RedCloth', require: 'redcloth'
-gem 'sqlite3'
+group :development do
+  gem 'jeweler'
+  gem 'yard'
+  gem 'RedCloth', require: 'redcloth'
+  gem 'sqlite3'
+  gem 'rspec'
+end
 
-# TEST
-gem 'rspec'
 group :test do
   gem 'factory_girl'
 end

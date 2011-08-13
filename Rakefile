@@ -6,7 +6,7 @@ rescue LoadError
   exit 1
 end
 
-Bundler.require :default
+Bundler.require :default, :development
 
 Jeweler::Tasks.new do |gem|
   gem.name = "slugalicious"
