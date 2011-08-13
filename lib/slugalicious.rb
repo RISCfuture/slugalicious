@@ -147,22 +147,26 @@ module Slugalicious
 
   module InstanceMethods
 
+    def slug_object
+      slugs.loaded? ? slugs.detect(&:active) : slugs.active.first
+    end
+    private :slug_object
+
     # @return [String, nil] The slug for this object, or @nil@ if none has been
     #   assigned.
 
     def slug
-      (slugs.loaded? ? slugs.detect(&:active?) : slugs.active.first).try(:slug)
+      Rails.cache.fetch("Slug/#{self.class.to_s}/#{id}/slug") do
+        slug_object.try(:slug)
+      end
     end
 
     # @return [String, nil] The full slug and path for this object, with scope
     #   included, or @nil@ if none has been assigned.
 
     def slug_with_path
-      slug = slugs.loaded? ? slugs.detect(&:active) : slugs.active.first
-      if slug then
-        slug.scope.to_s + slug.slug
-      else
-        nil
+      Rails.cache.fetch("Slug/#{self.class.to_s}/#{id}/slug_with_path") do
+        slug_object ? (slug_object.scope.to_s + slug_object.slug) : nil
       end
     end
 
@@ -183,6 +187,8 @@ module Slugalicious
         nil
       end
     end
+
+    private
 
     def make_slug
       slugs_in_use = if slugs.loaded? then

@@ -1,6 +1,7 @@
 Bundler.require :default, :test
 require 'active_support'
 require 'active_record'
+RAILS_CACHE = ActiveSupport::Cache::MemoryStore.new
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
@@ -26,6 +27,7 @@ require "#{File.dirname __FILE__}/factories"
 
 RSpec.configure do |config|
   config.before(:each) do
+    RAILS_CACHE.clear
     Slug.connection.execute "DROP TABLE IF EXISTS slugs"
     Slug.connection.execute <<-SQL
       CREATE TABLE slugs (
