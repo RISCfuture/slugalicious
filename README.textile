@@ -3,7 +3,7 @@ h1. Slugalicious -- Easy and powerful URL slugging for Rails 3
 _*(no monkey-patching required)*_
 
 | *Author* | Tim Morgan |
-| *Version* | 1.1.2 (Aug 13, 2011) |
+| *Version* | 1.2 (Aug 31, 2011) |
 | *License* | Released under the MIT license. |
 
 h2. About
