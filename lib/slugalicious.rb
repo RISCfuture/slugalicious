@@ -124,8 +124,8 @@ module Slugalicious
       options = slug_procs.extract_options!
       raise ArgumentError, "Must provide at least one field or proc to slug" if slug_procs.empty?
 
-      class_inheritable_array :_slug_procs, :_slug_blacklist
-      class_inheritable_accessor :_slugifier, :_slug_id_separator, :_slug_scope
+      class_attribute :_slug_procs, :_slug_blacklist
+      class_attribute :_slugifier, :_slug_id_separator, :_slug_scope
 
       self._slug_procs = slug_procs.map { |slug_proc| slug_proc.kind_of?(Symbol) ? ->(obj) { obj.send(slug_proc) } : slug_proc }
       self._slugifier = options[:slugifier] || ->(string) { string.to_url }
