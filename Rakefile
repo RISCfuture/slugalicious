@@ -1,13 +1,15 @@
-require 'rake'
+require 'rubygems'
+require 'bundler'
 begin
-  require 'bundler'
-rescue LoadError
-  puts "Bundler is not installed; install with `gem install bundler`."
-  exit 1
+  Bundler.setup(:default, :development)
+rescue Bundler::BundlerError => e
+  $stderr.puts e.message
+  $stderr.puts "Run `bundle install` to install missing gems"
+  exit e.status_code
 end
+require 'rake'
 
-Bundler.require :default, :development
-
+require 'jeweler'
 Jeweler::Tasks.new do |gem|
   gem.name = "slugalicious"
   gem.summary = %Q{Easy-to-use and powerful slugging for Rails 3}
@@ -16,13 +18,14 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/riscfuture/slugalicious"
   gem.authors = [ "Tim Morgan" ]
   gem.required_ruby_version = '>= 1.9'
-  gem.files = [ 'lib/**/*', 'LICENSE', 'README.textile', 'templates/*', 'slugalicious.gemspec' ]
+  gem.files = %w( lib/**/* LICENSE README.textile templates/* slugalicious.gemspec )
 end
-Jeweler::GemcutterTasks.new
+Jeweler::RubygemsDotOrgTasks.new
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new
 
+require 'yard'
 YARD::Rake::YardocTask.new('doc') do |doc|
   doc.options << "-m" << "textile"
   doc.options << "--protected"
