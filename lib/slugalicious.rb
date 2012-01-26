@@ -18,8 +18,6 @@ module Slugalicious
   MAX_SLUG_LENGTH = 126
 
   included do
-    extend ActiveSupport::Memoizable
-    memoize :slug, :active_slug?
     alias_method :to_param, :slug_with_path
     has_many :slugs, as: :sluggable
   end
@@ -143,39 +141,36 @@ module Slugalicious
     end
   end
 
-  # Methods added to instances when this module is included.
+  def slug_object
+    slugs.loaded? ? slugs.detect(&:active) : slugs.active.first
+  end
+  private :slug_object
 
-  module InstanceMethods
+  # @return [String, nil] The slug for this object, or @nil@ if none has been
+  #   assigned.
 
-    def slug_object
-      slugs.loaded? ? slugs.detect(&:active) : slugs.active.first
+  def slug
+    Rails.cache.fetch("Slug/#{self.class.to_s}/#{id}/slug") do
+      slug_object.try(:slug)
     end
-    private :slug_object
+  end
 
-    # @return [String, nil] The slug for this object, or @nil@ if none has been
-    #   assigned.
+  # @return [String, nil] The full slug and path for this object, with scope
+  #   included, or @nil@ if none has been assigned.
 
-    def slug
-      Rails.cache.fetch("Slug/#{self.class.to_s}/#{id}/slug") do
-        slug_object.try(:slug)
-      end
+  def slug_with_path
+    Rails.cache.fetch("Slug/#{self.class.to_s}/#{id}/slug_with_path") do
+      slug_object ? (slug_object.scope.to_s + slug_object.slug) : nil
     end
+  end
 
-    # @return [String, nil] The full slug and path for this object, with scope
-    #   included, or @nil@ if none has been assigned.
+  # @param [String] slug A slug for this object.
+  # @return [true, false, nil] @true@ if the slug is the currently active one
+  #   (should not redirect), @false@ if it's inactive (should redirect), and
+  #   @nil@ if it's not a known slug for the object (should 404).
 
-    def slug_with_path
-      Rails.cache.fetch("Slug/#{self.class.to_s}/#{id}/slug_with_path") do
-        slug_object ? (slug_object.scope.to_s + slug_object.slug) : nil
-      end
-    end
-
-    # @param [String] slug A slug for this object.
-    # @return [true, false, nil] @true@ if the slug is the currently active one
-    #   (should not redirect), @false@ if it's inactive (should redirect), and
-    #   @nil@ if it's not a known slug for the object (should 404).
-
-    def active_slug?(slug)
+  def active_slug?(slug)
+    @active_slug ||= begin
       slug = if slugs.loaded? then
                slugs.detect { |s| s.slug.downcase == slug.downcase }
              else
@@ -187,60 +182,60 @@ module Slugalicious
         nil
       end
     end
+  end
 
-    private
+  private
 
-    def make_slug
-      slugs_in_use = if slugs.loaded? then
-                       slugs.map(&:slug)
-                     else
-                       slugs.select(:slug).all.map(&:slug)
-                     end
+  def make_slug
+    slugs_in_use = if slugs.loaded? then
+                     slugs.map(&:slug)
+                   else
+                     slugs.select(:slug).all.map(&:slug)
+                   end
 
-      # grab a list of all potential slugs derived from the generators
-      potential_slugs = self.class._slug_procs.map { |slug_proc| slug_proc[self] }.
-        compact.
-        map { |slug| self.class._slugifier[slug] }.
-        map { |slug| slug[0, MAX_SLUG_LENGTH] }
-      raise "All slug generators returned nil for #{self.inspect}" if potential_slugs.empty?
-      # include the last-resort slug, trimmed for length
-      last_resort_append = "#{self.class._slug_id_separator}#{id}"
-      potential_slugs << "#{potential_slugs.first[0, [ 1, MAX_SLUG_LENGTH - last_resort_append.length ].max]}#{last_resort_append}"[0, MAX_SLUG_LENGTH]
-      # subtract out blacklisted slugs
-      potential_slugs -= self.class._slug_blacklist
-      
-      # if one of these slugs is already in use, we don't need to change the slug
-      # instead, activate the one of highest prioirty and we're done
-      valid_slugs_in_use = potential_slugs & slugs_in_use
-      unless valid_slugs_in_use.empty?
-        Slug.transaction do
-          slugs.update_all(active: false)
-          slugs.where(slug: valid_slugs_in_use.first).update_all(active: true)
-        end
-        return
-      end
-
+    # grab a list of all potential slugs derived from the generators
+    potential_slugs = self.class._slug_procs.map { |slug_proc| slug_proc[self] }.
+      compact.
+      map { |slug| self.class._slugifier[slug] }.
+      map { |slug| slug[0, MAX_SLUG_LENGTH] }
+    raise "All slug generators returned nil for #{self.inspect}" if potential_slugs.empty?
+    # include the last-resort slug, trimmed for length
+    last_resort_append = "#{self.class._slug_id_separator}#{id}"
+    potential_slugs << "#{potential_slugs.first[0, [ 1, MAX_SLUG_LENGTH - last_resort_append.length ].max]}#{last_resort_append}"[0, MAX_SLUG_LENGTH]
+    # subtract out blacklisted slugs
+    potential_slugs -= self.class._slug_blacklist
+    
+    # if one of these slugs is already in use, we don't need to change the slug
+    # instead, activate the one of highest prioirty and we're done
+    valid_slugs_in_use = potential_slugs & slugs_in_use
+    unless valid_slugs_in_use.empty?
       Slug.transaction do
-        # grab a list of all the slugs we can't use
-        scope = Slug.select(:slug).where(sluggable_type: self.class.to_s, slug: potential_slugs)
-        if self.class._slug_scope then
-          scope = scope.where(scope: self.class._slug_scope[self])
-        end
-        taken_slug_objects = scope.all
-
-        # subtract them out from all the potential slugs to make the available slugs
-        available_slugs = potential_slugs - taken_slug_objects.map(&:slug)
-        # no slugs available? nothing much else we can do
-        raise "Couldn't find a slug for #{self.inspect}; tried #{potential_slugs.join(', ')}" if available_slugs.empty?
-        
         slugs.update_all(active: false)
-        Slug.create!(sluggable: self,
-                     slug: available_slugs.first,
-                     active: true,
-                     scope: self.class._slug_scope.try(:call, self))
+        slugs.where(slug: valid_slugs_in_use.first).update_all(active: true)
       end
-
-      unmemoize_all
+      return
     end
+
+    Slug.transaction do
+      # grab a list of all the slugs we can't use
+      scope = Slug.select(:slug).where(sluggable_type: self.class.to_s, slug: potential_slugs)
+      if self.class._slug_scope then
+        scope = scope.where(scope: self.class._slug_scope[self])
+      end
+      taken_slug_objects = scope.all
+
+      # subtract them out from all the potential slugs to make the available slugs
+      available_slugs = potential_slugs - taken_slug_objects.map(&:slug)
+      # no slugs available? nothing much else we can do
+      raise "Couldn't find a slug for #{self.inspect}; tried #{potential_slugs.join(', ')}" if available_slugs.empty?
+
+      slugs.update_all(active: false)
+      Slug.create!(sluggable: self,
+                   slug: available_slugs.first,
+                   active: true,
+                   scope: self.class._slug_scope.try(:call, self))
+    end
+
+    @active_slug = nil
   end
 end
