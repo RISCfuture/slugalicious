@@ -58,7 +58,7 @@ For any model you want to slug, include the @Slugalicious@ module and call
 <pre><code>
 class User < ActiveRecord::Base
   include Slugalicious
-  slugged ->(user) { "#{user.first_name} #{user.last_name}" }
+  slugged lambda { |user| "#{user.first_name} #{user.last_name}" }
 end
 </code></pre>
 
@@ -83,7 +83,7 @@ but then add in the first name if two people share a last name, we'd call
 @slugged@ like so:
 
 <pre><code>
-slugged :last_name, ->(user) { "#{user.first_name} #{user.last_name}" }
+slugged :last_name, lambda { |user| "#{user.first_name} #{user.last_name}" }
 </code></pre>
 
 In the event that none of these generators manages to make a unique slug, a
@@ -111,7 +111,7 @@ symbol) or a @Proc@ that limits the scope of the uniqueness requirement:
 class Product < ActiveRecord::Base
   include Slugalicious
   belongs_to :department
-  slugged :name, scope: :department_url_component
+  slugged :name, :scope => :department_url_component
 
   private
 
@@ -134,7 +134,7 @@ included. You would usually use this method in conjunction with route globbing.
 For example, we could set up our @routes.rb@ file like so:
 
 <pre><code>
-get '/products/*path', 'products#show', as: :products
+get '/products/*path', 'products#show', :as => :products
 </code></pre>
 
 Then, in our @ProductsController@, we load the product from the path slug like
@@ -179,7 +179,7 @@ people know the URL has changed. As an example of how do this, we alter the
 def find_product
   @product = Product.find_from_slug_path(params[:path])
   unless @product.active_slug?(params[:path].split('/').last)
-    redirect_to product_url(@product), status: :moved_permanently
+    redirect_to product_url(@product), :status => :moved_permanently
     return false
   end
   return true

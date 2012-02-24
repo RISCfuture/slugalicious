@@ -36,4 +36,4 @@ YARD::Rake::YardocTask.new('doc') do |doc|
   doc.files = [ 'lib/**/*', 'README.textile', 'templates/slug.rb' ]
 end
 
-task(default: :spec)
+task(:default => :spec)

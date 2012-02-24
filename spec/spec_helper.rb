@@ -9,18 +9,18 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'slugalicious'
 
 ActiveRecord::Base.establish_connection(
-  adapter: 'sqlite3',
-  database: 'test.sqlite'
+  :adapter => 'sqlite3',
+  :database => 'test.sqlite'
 )
 require "#{File.dirname __FILE__}/../templates/slug"
 
 class User < ActiveRecord::Base
   include Slugalicious
-  slugged :last_name, ->(user) { "#{user.first_name} #{user.last_name}" }
+  slugged :last_name, lambda { |user| "#{user.first_name} #{user.last_name}" }
 end
 class Abuser < ActiveRecord::Base
   include Slugalicious
-  slugged :last_name, ->(user) { "#{user.first_name} #{user.last_name}" }
+  slugged :last_name, lambda { |user| "#{user.first_name} #{user.last_name}" }
 end
 
 require "#{File.dirname __FILE__}/factories"

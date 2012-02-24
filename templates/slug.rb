@@ -16,32 +16,33 @@
 # | @scope@ | Freeform data scoping this slug to a certain subset of records within the model. |
 
 class Slug < ActiveRecord::Base
-  belongs_to :sluggable, polymorphic: true
+  belongs_to :sluggable, :polymorphic => true
 
-  scope :for, ->(object_or_type, object_id=nil) {
+  scope :for, lambda { |object_or_type, *args|
+    object_id = args.first
     object_type = object_id ? object_or_type : object_or_type.class.to_s
     object_id ||= object_or_type.id
-    where(sluggable_type: object_type, sluggable_id: object_id)
+    where(:sluggable_type => object_type, :sluggable_id => object_id)
   }
-  scope :for_class, ->(model) { where(sluggable_type: model.to_s) }
-  scope :from_slug, ->(klass, scope, slug) {
-    where(sluggable_type: klass.to_s, slug: slug, scope: scope)
+  scope :for_class, lambda { |model| where(:sluggable_type => model.to_s) }
+  scope :from_slug, lambda { |klass, scope, slug|
+    where(:sluggable_type => klass.to_s, :slug => slug, :scope => scope)
   }
-  scope :active, where(active: true)
-  scope :inactive, where(active: false)
+  scope :active, where(:active => true)
+  scope :inactive, where(:active => false)
 
   validates :sluggable_type,
-            presence: true
+            :presence => true
   validates :sluggable_id,
-            presence: true,
-            numericality: { only_integer: true }
+            :presence => true,
+            :numericality => { :only_integer => true }
   validates :slug,
-            presence: true,
-            length: { maximum: 126 },
-            uniqueness: { case_sensitive: false, scope: [ :scope, :sluggable_type ] } #TODO validate scope case-insensitively
+            :presence => true,
+            :length => { :maximum => 126 },
+            :uniqueness => { :case_sensitive => false, :scope => [ :scope, :sluggable_type ] } #TODO validate scope case-insensitively
   validates :scope,
-            length: { maximum: 126 },
-            allow_blank: true
+            :length => { :maximum => 126 },
+            :allow_blank => true
   validate :one_active_slug_per_object
   
   after_save :invalidate_cache
@@ -52,7 +53,7 @@ class Slug < ActiveRecord::Base
 
   def activate!
     self.class.transaction do
-      Slug.for(sluggable_type, sluggable_id).update_all(active: false)
+      Slug.for(sluggable_type, sluggable_id).update_all(:active => false)
       update_attribute :active, true
     end
   end

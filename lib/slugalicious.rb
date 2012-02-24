@@ -19,7 +19,7 @@ module Slugalicious
 
   included do
     alias_method :to_param, :slug_with_path
-    has_many :slugs, as: :sluggable
+    has_many :slugs, :as => :sluggable
   end
 
   # Methods added to the class when this module is included.
@@ -125,11 +125,11 @@ module Slugalicious
       class_attribute :_slug_procs, :_slug_blacklist
       class_attribute :_slugifier, :_slug_id_separator, :_slug_scope
 
-      self._slug_procs = slug_procs.map { |slug_proc| slug_proc.kind_of?(Symbol) ? ->(obj) { obj.send(slug_proc) } : slug_proc }
-      self._slugifier = options[:slugifier] || ->(string) { string.to_url }
+      self._slug_procs = slug_procs.map { |slug_proc| slug_proc.kind_of?(Symbol) ? lambda { |obj| obj.send(slug_proc) } : slug_proc }
+      self._slugifier = options[:slugifier] || lambda { |string| string.to_url }
       self._slug_id_separator = options[:id_separator] || ';'
       self._slug_scope = if options[:scope].kind_of?(Symbol) then
-                           ->(record) { record.send(options[:scope]).to_s }
+                           lambda { |record| record.send(options[:scope]).to_s }
                          elsif options[:scope].kind_of?(Proc) then
                            options[:scope]
                          elsif options[:scope] then
@@ -174,7 +174,7 @@ module Slugalicious
       slug = if slugs.loaded? then
                slugs.detect { |s| s.slug.downcase == slug.downcase }
              else
-               slugs.where(slug: slug).first
+               slugs.where(:slug => slug).first
              end
       if slug then
         slug.active?
@@ -210,17 +210,17 @@ module Slugalicious
     valid_slugs_in_use = potential_slugs & slugs_in_use
     unless valid_slugs_in_use.empty?
       Slug.transaction do
-        slugs.update_all(active: false)
-        slugs.where(slug: valid_slugs_in_use.first).update_all(active: true)
+        slugs.update_all(:active => false)
+        slugs.where(:slug => valid_slugs_in_use.first).update_all(:active => true)
       end
       return
     end
 
     Slug.transaction do
       # grab a list of all the slugs we can't use
-      scope = Slug.select(:slug).where(sluggable_type: self.class.to_s, slug: potential_slugs)
+      scope = Slug.select(:slug).where(:sluggable_type => self.class.to_s, :slug => potential_slugs)
       if self.class._slug_scope then
-        scope = scope.where(scope: self.class._slug_scope[self])
+        scope = scope.where(:scope => self.class._slug_scope[self])
       end
       taken_slug_objects = scope.all
 
@@ -229,11 +229,11 @@ module Slugalicious
       # no slugs available? nothing much else we can do
       raise "Couldn't find a slug for #{self.inspect}; tried #{potential_slugs.join(', ')}" if available_slugs.empty?
 
-      slugs.update_all(active: false)
-      Slug.create!(sluggable: self,
-                   slug: available_slugs.first,
-                   active: true,
-                   scope: self.class._slug_scope.try(:call, self))
+      slugs.update_all(:active => false)
+      Slug.create!(:sluggable => self,
+                   :slug => available_slugs.first,
+                   :active => true,
+                   :scope => self.class._slug_scope.try(:call, self))
     end
 
     @active_slug = nil
