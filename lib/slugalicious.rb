@@ -19,7 +19,7 @@ module Slugalicious
 
   included do
     alias_method :to_param, :slug_with_path
-    has_many :slugs, as: :sluggable
+    has_many :slugs, as: :sluggable, dependent: :delete_all
   end
 
   # Methods added to the class when this module is included.
