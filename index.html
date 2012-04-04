@@ -1,0 +1,291 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Slugalicious by RISCfuture</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/RISCfuture/slugalicious">Fork On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/RISCfuture/slugalicious/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/RISCfuture/slugalicious/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Slugalicious</h1>
+          <p>Easy-to-use and powerful slugging for Rails 3</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/RISCfuture">RISCfuture</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>Slugalicious</h1>
+
+<p><strong>Easy and powerful URL slugging for Rails 3</strong></p>
+
+<p><em><em>(no monkey-patching required)</em></em></p>
+
+<table>
+<tr>
+<th align="left"></th>
+<th align="left"></th>
+</tr>
+<tr>
+<td align="left"><strong>Author</strong></td>
+<td align="left">Tim Morgan</td>
+</tr>
+<tr>
+<td align="left"><strong>Version</strong></td>
+<td align="left">1.2.1 (Mar 2, 2012)</td>
+</tr>
+<tr>
+<td align="left"><strong>License</strong></td>
+<td align="left">Released under the MIT license.</td>
+</tr>
+</table><h2>About</h2>
+
+<p>Slugalicious is an easy-to-use slugging library that helps you generate pretty
+URLs for your ActiveRecord objects. It's built for Rails 3 and is cordoned off
+in a monkey patching-free zone.</p>
+
+<p>Slugalicious is easy to use and powerful enough to cover all of the most common
+use-cases for slugging. Slugs are stored in a separate table, meaning you don't
+have to make schema changes to your models, and you can change slugs while still
+keeping the old URLs around for redirecting purposes.</p>
+
+<p>Slugalicious is an intelligent slug generator: You can specify multiple ways to
+generate slugs, and Slugalicious will try them all until it finds one that
+generates a unique slug. If all else fails, Slugalicious will fall back on a
+less pretty but guaranteed-unique backup slug generation strategy.</p>
+
+<p>Slugalicious works with the Stringex Ruby library, meaning you get meaningful
+slugs via the <code>String#to_url</code> method. Below are two examples of how powerful
+Stringex is:</p>
+
+<div class="highlight">
+<pre><span class="s2">"$6 Dollar Burger"</span><span class="o">.</span><span class="n">to_url</span> <span class="c1">#=&gt; "six-dollar-burger"</span>
+<span class="s2">"新年好"</span><span class="o">.</span><span class="n">to_url</span> <span class="c1">#=&gt; "xin-nian-hao"</span>
+</pre>
+</div>
+
+
+<h2>Installation</h2>
+
+<p><strong>Important Note:</strong> Slugalicious is written for Rails 3.0 and Ruby 1.9 only.</p>
+
+<p>Firstly, add the gem to your Rails project's <code>Gemfile</code>:</p>
+
+<div class="highlight">
+<pre><span class="n">gem</span> <span class="s1">'slugalicious'</span>
+</pre>
+</div>
+
+
+<p>Next, use the generator to add the <code>Slug</code> model and its migration to your
+project:</p>
+
+<div class="highlight">
+<pre><span class="n">rails</span> <span class="n">generate</span> <span class="n">slugalicious</span>
+</pre>
+</div>
+
+
+<p>Then run the migration to set up your database.</p>
+
+<h2>Usage</h2>
+
+<p>For any model you want to slug, include the <code>Slugalicious</code> module and call
+<code>slugged</code>:</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="kp">include</span> <span class="no">Slugalicious</span>
+  <span class="n">slugged</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">user</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"</span><span class="si">#{</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>Doing this sets the <code>to_param</code> method, so you can go ahead and start generating
+URLs using your models. You can use the <code>find_from_slug</code> method to load a record
+from a slug:</p>
+
+<div class="highlight">
+<pre><span class="n">user</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">find_from_slug</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:id</span><span class="o">]</span><span class="p">)</span>
+</pre>
+</div>
+
+
+<p>h3. Multiple slug generators</p>
+
+<p>The <code>slugged</code> method takes a list of method names (as symbols) or <code>Procs</code> that
+each attempt to generate a slug. Each of these generators is tried in order
+until a unique slug is generated. (The output of each of these generators is run
+through the slugifier to convert it to a URL-safe string. The slugifier is by
+default <code>String#to_url</code>, provided by the Stringex gem.)</p>
+
+<p>So, if we had our <code>User</code> class, and we first wanted to slug by last name only,
+but then add in the first name if two people share a last name, we'd call
+<code>slugged</code> like so:</p>
+
+<div class="highlight">
+<pre><span class="n">slugged</span> <span class="ss">:last_name</span><span class="p">,</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">user</span><span class="p">)</span> <span class="p">{</span> <span class="s2">"</span><span class="si">#{</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="si">}</span><span class="s2">"</span> <span class="p">}</span>
+</pre>
+</div>
+
+
+<p>In the event that none of these generators manages to make a unique slug, a
+fallback generator is used. This generator prepends the ID of the record, making
+it guaranteed unique. Let's use the example generators shown above. If we create
+a user with the name "Sancho Sample", he will get the slug "sample". Create
+another user with the same name, and that user will get the slug
+"sancho-sample;2". The semicolon is the default ID separator (and it can be
+overridden).</p>
+
+<p>h3. Scoped slugs</p>
+
+<p>Slugs must normally be unique for a single model type. Thus, if you have a
+<code>User</code> named Hammer and a <code>Product</code> named hammer, they can both share the
+"hammer" slug.</p>
+
+<p>If you want to decrease the uniqueness scope of a slug, you can do so with the
+<code>:scope</code> option on the <code>slugged</code> method. Let's say you wanted to limit the scope
+of a <code>Product</code>'s slug to its associated <code>Department</code>; that way you could have a
+product named "keyboard" in both the Computer Supplies and the Music Supplies
+departments. To do so, override the <code>:scope</code> option with a method name (as
+symbol) or a <code>Proc</code> that limits the scope of the uniqueness requirement:</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="kp">include</span> <span class="no">Slugalicious</span>
+  <span class="n">belongs_to</span> <span class="ss">:department</span>
+  <span class="n">slugged</span> <span class="ss">:name</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="ss">:department_url_component</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">department_url_component</span>
+    <span class="n">department</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">to_url</span> <span class="o">+</span> <span class="s2">"/"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>Now, your computer keyboard's slug will be "computer-supplies/keyboard" and your
+piano keyboard's slug will be "music-supplies/keyboard". There's an important
+thing to notice here: The method or proc you use to scope the slug must return a
+proper URL substring. That typically means you need to URL-escape it and add a
+slash at the end, as shown in the example above.</p>
+
+<p>When you call <code>to_param</code> on your piano keyboard, instead of just "keyboard", you
+will get "music-supplies/keyboard". Likewise, you can use the
+<code>find_from_slug_path</code> method to find a record from its full path, slug and scope
+included. You would usually use this method in conjunction with route globbing.
+For example, we could set up our <code>routes.rb</code> file like so:</p>
+
+<div class="highlight">
+<pre><span class="n">get</span> <span class="s1">'/products/*path'</span><span class="p">,</span> <span class="s1">'products#show'</span><span class="p">,</span> <span class="n">as</span><span class="p">:</span> <span class="ss">:products</span>
+</pre>
+</div>
+
+
+<p>Then, in our <code>ProductsController</code>, we load the product from the path slug like
+so:</p>
+
+<div class="highlight">
+<pre><span class="k">def</span> <span class="nf">find_product</span>
+  <span class="vi">@product</span> <span class="o">=</span> <span class="no">Product</span><span class="o">.</span><span class="n">find_from_slug_path</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:path</span><span class="o">]</span><span class="p">)</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>This is why it's very convenient to have your <code>:scope</code> method/proc not only
+return the uniqueness constraint, but also the scoped portion of the URL
+preceding the slug.</p>
+
+<h3>Altering and expiring slugs</h3>
+
+<p>When a model is created, it gets one slug, marked as the active slug (by
+default). This slug is the first generator that produces a unique slug string.</p>
+
+<p>If a model is updated, its slug is regenerated. Each of the slug generators is
+invoked, and if any of them produces an existing slug assigned to the object,
+that slug is made the active slug. (Priority goes to the first slug generator
+that produces an existing slug [active or inactive]).</p>
+
+<p>If none of the slug generators generates a known, existing slug belonging to the
+object, then the first unique slug is used. A new <code>Slug</code> instance is created and
+marked as active, and any other slugs belonging to the object are marked as
+inactive.</p>
+
+<p>Inactive slugs do not act any differently from active slugs. An object can be
+found by its inactive slug just as well as its active slug. The flag is there so
+you can alter the behavior of your application depending on whether the slug is
+current.</p>
+
+<p>A common application of this is to have inactive slugs 301-redirect to the
+active slug, as a way of both updating search engines' indexes and ensuring that
+people know the URL has changed. As an example of how do this, we alter the
+<code>find_product</code> method shown above to be like so:</p>
+
+<div class="highlight">
+<pre><span class="k">def</span> <span class="nf">find_product</span>
+  <span class="vi">@product</span> <span class="o">=</span> <span class="no">Product</span><span class="o">.</span><span class="n">find_from_slug_path</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:path</span><span class="o">]</span><span class="p">)</span>
+  <span class="k">unless</span> <span class="vi">@product</span><span class="o">.</span><span class="n">active_slug?</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:path</span><span class="o">].</span><span class="n">split</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">)</span>
+    <span class="n">redirect_to</span> <span class="n">product_url</span><span class="p">(</span><span class="vi">@product</span><span class="p">),</span> <span class="n">status</span><span class="p">:</span> <span class="ss">:moved_permanently</span>
+    <span class="k">return</span> <span class="kp">false</span>
+  <span class="k">end</span>
+  <span class="k">return</span> <span class="kp">true</span>
+<span class="k">end</span>
+</pre>
+</div>
+
+
+<p>The old URL will remain indefinitely, but users who hit it will be redirected to
+the new URL. Ideally, links to the old URL will be replaced over time with links
+to the new URL.</p>
+
+<p>The problem is that even though the old slug is inactive, it's still "taken." If
+you create a product called "Keyboard", but then rename it to "Piano", the
+product will claim both the "keyboard" and "piano" slugs. If you had renamed it
+to make room for a different product called "Keyboard" (like a computer
+keyboard), you'd find its slug is "keyboard;2" or similar.</p>
+
+<p>To prevent the slug namespace from becoming more and more polluted over time,
+websites generally expire inactive slugs after a period of time. To do this in
+Slugalicious, write a task that periodically checks for and deletes old,
+inactive <code>Slug</code> records. Such a task could be invoked through a cron job, for
+instance. An example:</p>
+
+<div class="highlight">
+<pre><span class="no">Slug</span><span class="o">.</span><span class="n">inactive</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">[</span> <span class="s2">"created_at &lt; ?"</span><span class="p">,</span> <span class="mi">30</span><span class="o">.</span><span class="n">days</span><span class="o">.</span><span class="n">ago</span> <span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">delete_all</span>
+</pre>
+</div>
+
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
