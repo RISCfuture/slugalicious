@@ -1,14 +1,16 @@
-Factory.define :slug do |f|
-  f.sequence(:slug) { |n| "slug-#{n}" }
-  f.active true
-end
+FactoryGirl.define do
+  factory :slug do
+    sequence(:slug) { |n| "slug-#{n}" }
+    active true
+  end
 
-Factory.define :user do |f|
-  f.first_name "Doctor"
-  f.last_name "Spaceman"
-end
+  factory :user do
+    first_name "Doctor"
+    last_name "Spaceman"
+  end
 
-Factory.define :abuser do |f|
-  f.first_name "Doctor"
-  f.last_name "Spaceman"
+  factory :abuser do
+    first_name "Doctor"
+    last_name "Spaceman"
+  end
 end
