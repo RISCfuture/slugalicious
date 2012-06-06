@@ -197,15 +197,15 @@ describe Slugalicious do
       User.find_from_slug('fn1', 'LN2').should eql(user2)
     end
 
-    it "should raise ActiveRecord::RecordNotFound if the slug does not exist" do
-      -> { User.find_from_slug('nonexist') }.should raise_error(ActiveRecord::RecordNotFound)
+    it "should return nil if the slug does not exist" do
+      User.find_from_slug('nonexist').should be_nil
     end
 
-    it "should raise ActiveRecord::RecordNotFound if the slug does not exist in scope" do
+    it "should return nil if the slug does not exist in scope" do
       User.send :slugged, :first_name, scope: :last_name
       Factory(:user, first_name: "FN1", last_name: "LN1")
       Factory(:user, first_name: "FN2", last_name: "LN2")
-      -> { User.find_from_slug('fn2', 'ln1') }.should raise_error(ActiveRecord::RecordNotFound)
+      User.find_from_slug('fn2', 'ln1').should be_nil
     end
 
     it "should find inactive slugs" do
@@ -213,6 +213,25 @@ describe Slugalicious do
       user = Factory(:user, first_name: 'New')
       Factory(:slug, sluggable: user, slug: 'old', active: false)
       User.find_from_slug('old').should eql(user)
+    end
+  end
+
+  describe "#find_from_slug!" do
+    it "should return a Slug object for a slug" do
+      User.send :slugged, :first_name, :last_name
+      user1 = Factory(:user, first_name: "FN1", last_name: "LN1")
+      User.find_from_slug!('fn1').should eql(user1)
+    end
+
+    it "should raise ActiveRecord::RecordNotFound if the slug does not exist" do
+      -> { User.find_from_slug!('nonexist') }.should raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "should raise ActiveRecord::RecordNotFound if the slug does not exist in scope" do
+      User.send :slugged, :first_name, scope: :last_name
+      Factory(:user, first_name: "FN1", last_name: "LN1")
+      Factory(:user, first_name: "FN2", last_name: "LN2")
+      -> { User.find_from_slug!('fn2', 'ln1') }.should raise_error(ActiveRecord::RecordNotFound)
     end
   end
 

@@ -26,18 +26,28 @@ module Slugalicious
 
   module ClassMethods
     
+    # Identical to {#find_from_slug}, but raises an exception if the object is
+    # not found.
+    #
+    # @raise [ActiveRecord::RecordNotFound] If no object with that slug is
+    #   found.
+    # @see #find_from_slug
+
+    def find_from_slug!(*args)
+      find_from_slug(*args) || raise(ActiveRecord::RecordNotFound)
+    end
+
     # Locates a record matching a given slug.
     #
     # @param [String] slug The slug to locate.
     # @param [String] scope The scope to search in (for use with scoped-unique
     #   slugs). This should be a string equal to the portion of the URL path
     #   preceding the slug.
-    # @return [ActiveRecord::Base] The object with that slug.
-    # @raise [ActiveRecord::RecordNotFound] If no object with that slug is
-    #   found.
+    # @return [ActiveRecord::Base, nil] The object with that slug, or `nil` if
+    #   not found.
 
     def find_from_slug(slug, scope=nil)
-      Slug.from_slug(self, scope, slug).first.try(:sluggable) || raise(ActiveRecord::RecordNotFound)
+      Slug.from_slug(self, scope, slug).first.try(:sluggable)
     end
 
     # Locates a record from a given path, that consists of a slug and its scope,
