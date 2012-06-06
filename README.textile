@@ -3,8 +3,16 @@ h1. Slugalicious -- Easy and powerful URL slugging for Rails 3
 _*(no monkey-patching required)*_
 
 | *Author* | Tim Morgan |
-| *Version* | 1.2.1 (Mar 2, 2012) |
+| *Version* | 2.0 (Jun 5, 2012) |
 | *License* | Released under the MIT license. |
+
+h3. Note about version 2.0
+
+Version 2.0 is so-versioned because it breaks the API for previous versions.
+Previously, where you would have used
+{Slugalicious::ClassMethods#find_from_slug find_from_slug}, you would now use
+{Slugalicious::ClassMethods#find_from_slug! find_from_slug!}. The old method now
+returns @nil@ when an object is not found, rather than raising an exception.
 
 h2. About
 
