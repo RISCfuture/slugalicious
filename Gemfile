@@ -1,4 +1,4 @@
-source :rubygems
+source 'https://rubygems.org'
 
 # DEPENDENCIES
 gem 'rails', '>= 3.1'
