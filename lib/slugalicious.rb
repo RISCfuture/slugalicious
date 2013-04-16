@@ -200,7 +200,7 @@ module Slugalicious
     slugs_in_use = if slugs.loaded? then
                      slugs.map(&:slug)
                    else
-                     slugs.select(:slug).all.map(&:slug)
+                     slugs.select(:slug).map(&:slug)
                    end
 
     # grab a list of all potential slugs derived from the generators
@@ -232,7 +232,7 @@ module Slugalicious
       if self.class._slug_scope then
         scope = scope.where(scope: self.class._slug_scope[self])
       end
-      taken_slug_objects = scope.all
+      taken_slug_objects = scope
 
       # subtract them out from all the potential slugs to make the available slugs
       available_slugs = potential_slugs - taken_slug_objects.map(&:slug)
