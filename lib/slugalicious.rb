@@ -122,7 +122,7 @@ module Slugalicious
     #     same value. If not provided, slugs must be globally unique for this
     #     model. The string returned should be equal to the portion of the URL
     #     path that precedes the slug.
-    #   @option options [Array<String>, String] :blacklist ([ 'new', 'edit', 'delete' ])
+    #   @option options [Array<String>, String] :blacklist ([ 'new', 'edit', 'delete', 'destroy' ])
     #     A list of slugs that are disallowed. You would use this to prevent
     #     slugs from sharing the same name as actions in your resource
     #     controller.
@@ -145,7 +145,7 @@ module Slugalicious
                          elsif options[:scope] then
                            raise ArgumentError, ":scope must be a symbol or proc"
                          end
-      self._slug_blacklist = Array.wrap(options[:blacklist] || %w( new edit delete ))
+      self._slug_blacklist = Array.wrap(options[:blacklist] || %w( new edit delete destroy ))
 
       after_save :make_slug
     end
