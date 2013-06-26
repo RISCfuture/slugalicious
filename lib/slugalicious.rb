@@ -1,7 +1,7 @@
 require 'slugalicious_generator'
 require 'stringex'
 
-# Adds the @slugged@ method to an @ActiveRecord::Base@ subclass. You can then
+# Adds the `slugged` method to an `ActiveRecord::Base` subclass. You can then
 # call this method to add slugging support to your model. See the
 # {ClassMethods#slugged} method for more details.
 #
@@ -67,17 +67,17 @@ module Slugalicious
     protected
     
     # Call this method to indicate that your model uses slugging. Pass a list of
-    # *slug generators*: either symbols (method names) or procs that return
+    # **slug generators**: either symbols (method names) or procs that return
     # strings. These strings will be used to generate the slug. You must pass at
     # least one generator. If you pass more than one, the first one that returns
     # a unique slug will be used.
     #
     # The generator does not need to sanitize or parameterize its output; the
-    # @:slugifier@ option can be used to override the default parameterization.
+    # `:slugifier` option can be used to override the default parameterization.
     #
     # In the event that no generator returns a unique slug, the slug returned by
     # the last generator will have the ID of the record appended to it. The ID
-    # and the slug will be separated by the @:id_separator@ option (semicolon by
+    # and the slug will be separated by the `:id_separator` option (semicolon by
     # default). _This_ slug is hopefully unique, because if not, an exception is
     # raised.
     #
@@ -86,28 +86,28 @@ module Slugalicious
     #
     # h2. Scopes
     #
-    # You can scope your slugs to certain URL subpaths using the @:scope@
-    # option. The @:scope:@ option takes a method name or a @Proc@ that, when
+    # You can scope your slugs to certain URL subpaths using the `:scope`
+    # option. The `:scope:` option takes a method name or a `Proc` that, when
     # run, returns a string that scopes the uniqueness constraint of a slug.
     # Rather than being globally unique, the slug must only be unique among
     # other slugs that share the same scope.
     #
-    # *Important note:* The method or @Proc@ that you use for the @:scope@
+    # **Important note:** The method or `Proc` that you use for the `:scope`
     # option should return the portion of the URL preceding the slug, _slash
-    # included_. Let's say you have slugged your @User@ model's @login@ field,
+    # included_. Let's say you have slugged your `User` model's `login` field,
     # and you have two scopes: customers and merchants. In that case, you would
-    # want the @:scope@ method/proc to return either "clients/" or "merchants/".
+    # want the `:scope` method/proc to return either "clients/" or "merchants/".
     #
-    # The string returned by the @:scope@ option will be used to build the full
-    # URL to an object. If you have a client @User@ with login "fancylad", a
-    # call to @to_param@ will return "clients/fancyland". The scope portion of
+    # The string returned by the `:scope` option will be used to build the full
+    # URL to an object. If you have a client `User` with login "fancylad", a
+    # call to `to_param` will return "clients/fancyland". The scope portion of
     # that URL path is used un-sanitized, un-escaped, and un-processed. It is
     # therefore up to _you_ to ensure your scopes are valid URL strings, using
-    # say @String#to_url@ (included as part of this gem).
+    # say `String#to_url` (included as part of this gem).
     #
     # @overload slugged(generator, ..., options={})
-    #   @param [Proc, Symbol] generator If it's a @Symbol@, indicates a method
-    #     that will be called that will return a @String@ to be used for the
+    #   @param [Proc, Symbol] generator If it's a `Symbol`, indicates a method
+    #     that will be called that will return a `String` to be used for the
     #     slug.
     #   @param [Hash] options Additonal options that control slug generation.
     #   @option options [Proc] :slugifier (&:to_url) A proc that, when given a
@@ -116,7 +116,7 @@ module Slugalicious
     #     the "last-resort" slug between the slug and the model ID. This should
     #     be an URL-safe character that would never be produced by your
     #     slugifier.
-    #   @option options [Symbol, Proc] :scope A method name or @Proc@ to run
+    #   @option options [Symbol, Proc] :scope A method name or `Proc` to run
     #     (receives the object being slugged) that returns a string. Slugs must
     #     be unique across all objects for which this method/proc returns the
     #     same value. If not provided, slugs must be globally unique for this
@@ -156,7 +156,7 @@ module Slugalicious
   end
   private :slug_object
 
-  # @return [String, nil] The slug for this object, or @nil@ if none has been
+  # @return [String, nil] The slug for this object, or `nil` if none has been
   #   assigned.
 
   def slug
@@ -166,7 +166,7 @@ module Slugalicious
   end
 
   # @return [String, nil] The full slug and path for this object, with scope
-  #   included, or @nil@ if none has been assigned.
+  #   included, or `nil` if none has been assigned.
 
   def slug_with_path
     Rails.cache.fetch("Slug/#{self.class.to_s}/#{id}/slug_with_path") do
@@ -175,9 +175,9 @@ module Slugalicious
   end
 
   # @param [String] slug A slug for this object.
-  # @return [true, false, nil] @true@ if the slug is the currently active one
-  #   (should not redirect), @false@ if it's inactive (should redirect), and
-  #   @nil@ if it's not a known slug for the object (should 404).
+  # @return [true, false, nil] `true` if the slug is the currently active one
+  #   (should not redirect), `false` if it's inactive (should redirect), and
+  #   `nil` if it's not a known slug for the object (should 404).
 
   def active_slug?(slug)
     @active_slug ||= begin

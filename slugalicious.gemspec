@@ -14,11 +14,10 @@ Gem::Specification.new do |s|
   s.email = "git@timothymorgan.info"
   s.extra_rdoc_files = [
     "LICENSE",
-    "README.textile"
+    "README.md"
   ]
   s.files = [
     "LICENSE",
-    "README.textile",
     "lib/slugalicious.rb",
     "lib/slugalicious_generator.rb",
     "slugalicious.gemspec",
@@ -39,26 +38,32 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<stringex>, [">= 0"])
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<yard>, [">= 0"])
+      s.add_development_dependency(%q<redcarpet>, [">= 0"])
       s.add_development_dependency(%q<RedCloth>, [">= 0"])
       s.add_development_dependency(%q<sqlite3>, [">= 0"])
       s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<factory_girl>, [">= 0"])
     else
       s.add_dependency(%q<rails>, [">= 4.0"])
       s.add_dependency(%q<stringex>, [">= 0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<yard>, [">= 0"])
+      s.add_dependency(%q<redcarpet>, [">= 0"])
       s.add_dependency(%q<RedCloth>, [">= 0"])
       s.add_dependency(%q<sqlite3>, [">= 0"])
       s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<factory_girl>, [">= 0"])
     end
   else
     s.add_dependency(%q<rails>, [">= 4.0"])
     s.add_dependency(%q<stringex>, [">= 0"])
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<yard>, [">= 0"])
+    s.add_dependency(%q<redcarpet>, [">= 0"])
     s.add_dependency(%q<RedCloth>, [">= 0"])
     s.add_dependency(%q<sqlite3>, [">= 0"])
     s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<factory_girl>, [">= 0"])
   end
 end
 

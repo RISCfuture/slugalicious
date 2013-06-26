@@ -68,6 +68,7 @@ GEM
     rake (10.1.0)
     rdoc (4.0.1)
       json (~> 1.4)
+    redcarpet (2.3.0)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
@@ -105,6 +106,7 @@ DEPENDENCIES
   factory_girl
   jeweler
   rails (>= 4.0)
+  redcarpet
   rspec
   sqlite3
   stringex

@@ -5,15 +5,21 @@
 # redirect purposes. Once a slug is old enough, it is deleted and its value can
 # be used for new records (no longer redirects).
 #
-# h2. Associations
+# Associations
+# ============
 #
-# | @sluggable@ | The record that this slug references. |
+# |             |                                       |
+# |:------------|:--------------------------------------|
+# | `sluggable` | The record that this slug references. |
 #
-# h2. Properties
+# Properties
+# ==========
 #
-# | @slug@ | The slug, lowercased and normalized. Slugs must be unique to their @sluggable_type@ and @scope@. |
-# | @active@ | Whether this is the most recently generated slug for the sluggable. |
-# | @scope@ | Freeform data scoping this slug to a certain subset of records within the model. |
+# |          |                                                                                                  |
+# |:---------|:-------------------------------------------------------------------------------------------------|
+# | `slug`   | The slug, lowercased and normalized. Slugs must be unique to their `sluggable_type` and `scope`. |
+# | `active` | Whether this is the most recently generated slug for the sluggable.                              |
+# | `scope`  | Freeform data scoping this slug to a certain subset of records within the model.                 |
 
 class Slug < ActiveRecord::Base
   belongs_to :sluggable, polymorphic: true
@@ -38,22 +44,22 @@ class Slug < ActiveRecord::Base
   validates :slug,
             presence: true,
             length: { maximum: 126 },
-            uniqueness: { case_sensitive: false, scope: [ :scope, :sluggable_type ] } #TODO validate scope case-insensitively
+            uniqueness: { case_sensitive: false, scope: [ :scope, :sluggable_type ] }
   validates :scope,
             length: { maximum: 126 },
-            allow_blank: true
+            allow_nil: true
   validate :one_active_slug_per_object
-  
+
   after_save :invalidate_cache
   after_destroy :invalidate_cache
-  
+
   # Marks a slug as active and deactivates all other slugs assigned to the
   # record.
 
   def activate!
     self.class.transaction do
       Slug.for(sluggable_type, sluggable_id).update_all(active: false)
-      update_attribute :active, true
+      update_column :active, true
     end
   end
 
@@ -63,7 +69,7 @@ class Slug < ActiveRecord::Base
     return unless new_record? or (active? and active_changed?)
     errors.add(:active, :one_per_sluggable) if active? and Slug.active.for(sluggable_type, sluggable_id).count > 0
   end
-  
+
   def invalidate_cache
     Rails.cache.delete "Slug/#{sluggable_type}/#{sluggable_id}/slug"
     Rails.cache.delete "Slug/#{sluggable_type}/#{sluggable_id}/slug_with_path"
