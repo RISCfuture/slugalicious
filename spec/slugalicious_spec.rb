@@ -65,7 +65,7 @@ describe Slugalicious do
       
       object.update_attribute :last_name, 'baz'
       object.slug.should eql("foo")
-      other_slug.reload.active.should be_false
+      other_slug.reload.should_not be_active
     end
 
     it "should ignore slugs from other models" do

@@ -69,36 +69,36 @@ describe Slug do
     end
     
     it "should write the slug to the cache" do
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should be_nil
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
+      Rails.cache.read("Slug/User/#{@record.id}/slug").should be_nil
+      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
       
       @record.slug
       @record.slug_with_path
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
+      Rails.cache.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
+      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
     end
     
     it "should remove the cached slug when the slug is changed" do
       slug = FactoryGirl.create(:slug, sluggable: @record, active: false)
       slug.activate!
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should be_nil
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
+      Rails.cache.read("Slug/User/#{@record.id}/slug").should be_nil
+      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
       
       @record.slug
       @record.slug_with_path
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
+      Rails.cache.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
+      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
     end
     
     it "should remove the cached slug when the slug is deleted" do
       @record.slug
       @record.slug_with_path
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
+      Rails.cache.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
+      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
       
       Slug.for(@record).first.destroy
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug").should be_nil
-      RAILS_CACHE.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
+      Rails.cache.read("Slug/User/#{@record.id}/slug").should be_nil
+      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
     end
   end
 end

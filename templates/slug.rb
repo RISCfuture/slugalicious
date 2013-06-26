@@ -27,8 +27,8 @@ class Slug < ActiveRecord::Base
   scope :from_slug, ->(klass, scope, slug) {
     where(sluggable_type: klass.to_s, slug: slug, scope: scope)
   }
-  scope :active, where(active: true)
-  scope :inactive, where(active: false)
+  scope :active, -> { where(active: true) }
+  scope :inactive, -> { where(active: false) }
 
   validates :sluggable_type,
             presence: true

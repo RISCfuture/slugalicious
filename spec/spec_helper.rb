@@ -1,7 +1,8 @@
-Bundler.require :default, :test
+require 'bundler'
+Bundler.require :default, :development
 require 'active_support'
 require 'active_record'
-RAILS_CACHE = ActiveSupport::Cache::MemoryStore.new
+Rails.cache = Rails.cache = ActiveSupport::Cache::MemoryStore.new
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
@@ -27,14 +28,14 @@ require "#{File.dirname __FILE__}/factories"
 
 RSpec.configure do |config|
   config.before(:each) do
-    RAILS_CACHE.clear
+    Rails.cache.clear
     Slug.connection.execute "DROP TABLE IF EXISTS slugs"
     Slug.connection.execute <<-SQL
       CREATE TABLE slugs (
         id INTEGER PRIMARY KEY ASC,
         sluggable_type VARCHAR(126) NOT NULL,
         sluggable_id INTEGER NOT NULL,
-        active BOOLEAN NOT NULL DEFAULT 1,
+        active INTEGER NOT NULL DEFAULT 1,
         slug VARCHAR(126) NOT NULL,
         scope VARCHAR(126)
       )

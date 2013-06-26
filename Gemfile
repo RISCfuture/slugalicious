@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # DEPENDENCIES
-gem 'rails', '>= 3.1'
+gem 'rails', '>= 4.0'
 gem 'stringex'
 
 # DEVELOPMENT
@@ -11,8 +11,5 @@ group :development do
   gem 'RedCloth', require: 'redcloth'
   gem 'sqlite3'
   gem 'rspec'
-end
-
-group :test do
   gem 'factory_girl'
 end

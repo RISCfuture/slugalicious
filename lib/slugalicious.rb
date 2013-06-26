@@ -47,7 +47,7 @@ module Slugalicious
     #   not found.
 
     def find_from_slug(slug, scope=nil)
-      Slug.from_slug(self, scope, slug).first.try(:sluggable)
+      Slug.from_slug(self, scope, slug).first.try!(:sluggable)
     end
 
     # Locates a record from a given path, that consists of a slug and its scope,
@@ -152,7 +152,7 @@ module Slugalicious
   end
 
   def slug_object
-    slugs.loaded? ? slugs.detect(&:active) : slugs.active.first
+    slugs.loaded? ? slugs.detect(&:active?) : slugs.active.first
   end
   private :slug_object
 
@@ -161,7 +161,7 @@ module Slugalicious
 
   def slug
     Rails.cache.fetch("Slug/#{self.class.to_s}/#{id}/slug") do
-      slug_object.try(:slug)
+      slug_object.try!(:slug)
     end
   end
 
@@ -243,7 +243,8 @@ module Slugalicious
       Slug.create!(sluggable: self,
                    slug: available_slugs.first,
                    active: true,
-                   scope: self.class._slug_scope.try(:call, self))
+                   scope: self.class._slug_scope.try!(:call, self))
+      slugs(true)
     end
 
     @active_slug = nil
