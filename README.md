@@ -1,4 +1,4 @@
-Slugalicious -- Easy and powerful URL slugging for Rails 3
+Slugalicious -- Easy and powerful URL slugging for Rails 4
 ==========================================================
 
 _(no monkey-patching required)_
@@ -6,7 +6,7 @@ _(no monkey-patching required)_
 |             |                                 |
 |:------------|:--------------------------------|
 | **Author**  | Tim Morgan                      |
-| **Version** | 2.0 (Jun 5, 2012)               |
+| **Version** | 2.1 (Jul 9, 2013)               |
 | **License** | Released under the MIT license. |
 
 ### Note about version 2.0
@@ -21,7 +21,7 @@ About
 -----
 
 Slugalicious is an easy-to-use slugging library that helps you generate pretty
-URLs for your ActiveRecord objects. It's built for Rails 3 and is cordoned off
+URLs for your ActiveRecord objects. It's built for Rails 4 and is cordoned off
 in a monkey patching-free zone.
 
 Slugalicious is easy to use and powerful enough to cover all of the most common
@@ -46,7 +46,7 @@ Stringex is:
 Installation
 ------------
 
-*Important Note:* Slugalicious is written for Rails 3.0 and Ruby 1.9 only.
+*Important Note:* Slugalicious is written for Rails 4.0 and Ruby 1.9 only.
 
 Firstly, add the gem to your Rails project's `Gemfile`:
 

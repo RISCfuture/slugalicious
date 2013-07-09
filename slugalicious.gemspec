@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "slugalicious"
-  s.version = "2.0.0"
+  s.version = "2.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Tim Morgan"]
-  s.date = "2013-06-26"
+  s.date = "2013-07-09"
   s.description = "Slugalicious adds simple and powerful slugging to your ActiveRecord models."
   s.email = "git@timothymorgan.info"
   s.extra_rdoc_files = [
