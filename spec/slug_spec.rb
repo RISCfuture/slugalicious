@@ -10,34 +10,34 @@ describe Slug do
     it "should not allow an active slug to be created if one already exists" do
       FactoryGirl.create(:slug, sluggable: @record)
       slug = FactoryGirl.build(:slug, sluggable: @record)
-      slug.should_not be_valid
-      slug.errors[:active].should_not be_empty
+      expect(slug).not_to be_valid
+      expect(slug.errors[:active]).not_to be_empty
     end
 
     it "should not allow a slug to be made active if one already exists" do
       FactoryGirl.create(:slug, sluggable: @record)
       slug = FactoryGirl.create(:slug, sluggable: @record, active: false)
       slug.active = true
-      slug.should_not be_valid
-      slug.errors[:active].should_not be_empty
+      expect(slug).not_to be_valid
+      expect(slug.errors[:active]).not_to be_empty
     end
 
     it "should allow an active slug to be created if none exists" do
       slug = FactoryGirl.build(:slug, sluggable: @record)
-      slug.should be_valid
+      expect(slug).to be_valid
     end
 
     it "should allow a slug to be made active if none exists" do
       slug = FactoryGirl.create(:slug, sluggable: @record, active: false)
       slug.active = true
-      slug.should be_valid
+      expect(slug).to be_valid
     end
 
     it "should allow an inactive slug to be modified if the active field is not changing" do
       FactoryGirl.create(:slug, sluggable: @record)
       slug = FactoryGirl.create(:slug, sluggable: @record, active: false)
       slug.scope = 'test'
-      slug.should be_valid
+      expect(slug).to be_valid
     end
   end
 
@@ -45,7 +45,7 @@ describe Slug do
     it "should mark the slug as active" do
       slug = FactoryGirl.create(:slug, sluggable: FactoryGirl.create(:user), active: false)
       slug.activate!
-      slug.should be_active
+      expect(slug).to be_active
     end
 
     it "should deactivate all the record's other slugs" do
@@ -57,9 +57,9 @@ describe Slug do
       slug = FactoryGirl.create(:slug, sluggable: record, active: false)
       slug.activate!
 
-      s1.reload.should_not be_active
-      s2.reload.should_not be_active
-      s3.reload.should_not be_active
+      expect(s1.reload).not_to be_active
+      expect(s2.reload).not_to be_active
+      expect(s3.reload).not_to be_active
     end
   end
   
@@ -69,36 +69,36 @@ describe Slug do
     end
     
     it "should write the slug to the cache" do
-      Rails.cache.read("Slug/User/#{@record.id}/slug").should be_nil
-      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug")).to be_nil
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug_with_path")).to be_nil
       
       @record.slug
       @record.slug_with_path
-      Rails.cache.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
-      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug")).to eql(@record.slug)
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug_with_path")).to eql(@record.slug_with_path)
     end
     
     it "should remove the cached slug when the slug is changed" do
       slug = FactoryGirl.create(:slug, sluggable: @record, active: false)
       slug.activate!
-      Rails.cache.read("Slug/User/#{@record.id}/slug").should be_nil
-      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug")).to be_nil
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug_with_path")).to be_nil
       
       @record.slug
       @record.slug_with_path
-      Rails.cache.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
-      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug")).to eql(@record.slug)
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug_with_path")).to eql(@record.slug_with_path)
     end
     
     it "should remove the cached slug when the slug is deleted" do
       @record.slug
       @record.slug_with_path
-      Rails.cache.read("Slug/User/#{@record.id}/slug").should eql(@record.slug)
-      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should eql(@record.slug_with_path)
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug")).to eql(@record.slug)
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug_with_path")).to eql(@record.slug_with_path)
       
       Slug.for(@record).first.destroy
-      Rails.cache.read("Slug/User/#{@record.id}/slug").should be_nil
-      Rails.cache.read("Slug/User/#{@record.id}/slug_with_path").should be_nil
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug")).to be_nil
+      expect(Rails.cache.read("Slug/User/#{@record.id}/slug_with_path")).to be_nil
     end
   end
 end
