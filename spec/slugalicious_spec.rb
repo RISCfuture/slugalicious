@@ -7,7 +7,7 @@ describe Slugalicious do
     @model.send :include, ActiveModel::Validations::Callbacks
     @model.send :include, ActiveRecord::Callbacks
     @model.send :include, ActiveRecord::Validations
-    @model.stub!(:has_many)
+    @model.stub(:has_many)
     @model.send :include, Slugalicious
   end
 
