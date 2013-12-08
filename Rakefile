@@ -17,7 +17,7 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/riscfuture/slugalicious"
   gem.authors = [ "Tim Morgan" ]
   gem.required_ruby_version = '>= 1.9'
-  gem.files = %w( lib/**/* LICENSE README.textile templates/* slugalicious.gemspec )
+  gem.files = %w( lib/**/* LICENSE README.md templates/* slugalicious.gemspec )
 end
 Jeweler::RubygemsDotOrgTasks.new
 
