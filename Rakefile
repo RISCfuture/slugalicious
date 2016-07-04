@@ -9,7 +9,7 @@ rescue Bundler::BundlerError => e
 end
 require 'rake'
 
-Jeweler::Tasks.new do |gem|
+Juwelier::Tasks.new do |gem|
   gem.name = "slugalicious"
   gem.summary = %Q{Easy-to-use and powerful slugging for Rails 3}
   gem.description = %Q{Slugalicious adds simple and powerful slugging to your ActiveRecord models.}
@@ -19,7 +19,7 @@ Jeweler::Tasks.new do |gem|
   gem.required_ruby_version = '>= 1.9'
   gem.files = %w( lib/**/* LICENSE README.md templates/* slugalicious.gemspec )
 end
-Jeweler::RubygemsDotOrgTasks.new
+Juwelier::RubygemsDotOrgTasks.new
 
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new

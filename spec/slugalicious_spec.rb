@@ -83,8 +83,8 @@ describe Slugalicious do
     end
 
     it "should raise an error if all generators return nil" do
-      User.send :slugged, :gender, :birthdate
-      expect { FactoryGirl.create(:user, gender: nil, birthdate: nil) }.to raise_error
+      User.send :slugged, :gender, :callsign
+      expect { FactoryGirl.create(:user, gender: nil, callsign: nil) }.to raise_error(/All slug generators returned nil/)
     end
     
     it "should use the first non-nil slug for the last-resort generator" do
@@ -169,7 +169,7 @@ describe Slugalicious do
       Slugalicious::MAX_SLUG_LENGTH = 1
 
       User.send :slugged, ->(object) { 'f' }, blacklist: 'f'
-      expect { FactoryGirl.create(:user, first_name: 'Foo', last_name: 'Bar') }.to raise_error
+      expect { FactoryGirl.create(:user, first_name: 'Foo', last_name: 'Bar') }.to raise_error(/Couldn't find a slug/)
       
       Slugalicious::MAX_SLUG_LENGTH = old_length
     end

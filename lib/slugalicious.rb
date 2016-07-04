@@ -244,7 +244,7 @@ module Slugalicious
                    slug: available_slugs.first,
                    active: true,
                    scope: self.class._slug_scope.try!(:call, self))
-      slugs(true)
+      slugs.reload
     end
 
     @active_slug = nil

@@ -1,12 +1,12 @@
 source 'https://rubygems.org'
 
 # DEPENDENCIES
-gem 'rails', '>= 4.0'
+gem 'rails', '>= 5.0.0'
 gem 'stringex'
 
 # DEVELOPMENT
 group :development do
-  gem 'jeweler'
+  gem 'juwelier'
   gem 'yard'
   gem 'redcarpet'
   gem 'RedCloth', require: 'redcloth'
