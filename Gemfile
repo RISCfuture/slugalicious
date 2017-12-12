@@ -12,5 +12,5 @@ group :development do
   gem 'RedCloth', require: 'redcloth'
   gem 'sqlite3'
   gem 'rspec'
-  gem 'factory_girl'
+  gem 'factory_bot'
 end
